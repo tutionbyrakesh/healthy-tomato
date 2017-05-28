@@ -1,0 +1,6 @@
+1. right click on this exe and run as administrator
+2. run the command 
+ngrok http 8080
+
+3. now you will get the link copy the link
+this link is equivalent to http://localhost:8080
