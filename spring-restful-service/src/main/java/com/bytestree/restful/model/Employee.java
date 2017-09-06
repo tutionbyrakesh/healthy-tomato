@@ -35,6 +35,17 @@ public class Employee implements java.io.Serializable {
 
 	@Column(name = "salary")
 	private Integer salary;
+	
+	@Column(name = "age")
+	private Integer age;
+	
+	public Integer getAge() {
+		return age;
+	}
+
+	public void setAge(Integer age) {
+		this.age = age;
+	}
 
 	public Employee() {
 	}

@@ -1,5 +1,6 @@
 package com.bytestree.restful.controller;
 
+import java.awt.PageAttributes.MediaType;
 import java.util.Arrays;
 import java.util.List;
 
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bytestree.restful.controller.exception.CustomException;
+import com.bytestree.restful.controller.exception.ExceptionThrower;
 import com.bytestree.restful.model.Employee;
 import com.bytestree.restful.service.EmployeeService;
 
@@ -39,7 +42,7 @@ public class EmployeeController {
 	}
 
 
-	@RequestMapping(method = RequestMethod.PUT)
+	/*@RequestMapping(method = RequestMethod.PUT)
 	public ResponseEntity<Void> updateEmployee(@RequestBody Employee employee) {
 		Employee existingEmp = empService.getById(employee.getId());
 		if (existingEmp == null) {
@@ -49,16 +52,54 @@ public class EmployeeController {
 			empService.save(employee);
 			return new ResponseEntity<Void>(HttpStatus.OK);
 		}
+	}*/
+	
+	@RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+	public ResponseEntity<Void> updateEmployee(@RequestBody Employee employee,@PathVariable("id") Long id) {
+		Employee existingEmp = empService.getById(id);
+		if (existingEmp == null) {
+			logger.debug("Employee with id " + employee.getId() + " does not exists");
+			return new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
+		} else {
+			if(employee.getFirstname()!=null)
+				existingEmp.setFirstname(employee.getFirstname());
+			
+			if(employee.getLastname()!=null)
+				existingEmp.setLastname(employee.getLastname());
+			
+			if(employee.getDesignation()!=null)
+				existingEmp.setDesignation(employee.getDesignation());
+			
+			if(employee.getAge()!=null)
+				existingEmp.setAge(employee.getAge());
+			
+			if(employee.getSalary()!=null)
+				existingEmp.setSalary(employee.getSalary());
+			
+			
+			empService.save(employee);
+			return new ResponseEntity<Void>(HttpStatus.CREATED);
+		}
 	}
 
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
-	public ResponseEntity<Employee> getEmployee(@PathVariable("id") Long id) {
+	public ResponseEntity<Employee> getEmployee(@PathVariable("id") Long id)
+			throws Exception {
 		Employee employee = empService.getById(id);
+
+		// Exception handling finish here
 		if (employee == null) {
 			logger.debug("Employee with id " + id + " does not exists");
 			return new ResponseEntity<Employee>(HttpStatus.NOT_FOUND);
 		}
+
+		// Exception handling
+		if (employee.getAge() < 18 || employee.getAge() > 60) {
+			ExceptionThrower et = new ExceptionThrower();
+			et.throwNotaValidAgeException();
+		}
+
 		logger.debug("Found Employee:: " + employee);
 		return new ResponseEntity<Employee>(employee, HttpStatus.OK);
 	}
